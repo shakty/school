@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Division 3: Große Zahlen zerlegen</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #142033;
+      --muted: #566276;
+      --line: #d7dee8;
+      --paper: #fffefa;
+      --field: #e8f6ed;
+      --gold: #f2b544;
+      --blue: #1f5e9d;
+      --green: #16764f;
+      --red: #b43b3b;
+      --violet: #6750a4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #ecf6ff 0%, #fbfdff 42%, #eef7f0 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      width: min(920px, calc(100vw - 28px));
+      margin: 22px auto 40px;
+    }
+    header {
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
+    h1, h2, h3 { line-height: 1.15; margin: 0 0 12px; }
+    h1 { font-size: clamp(2rem, 5vw, 3.05rem); letter-spacing: 0; }
+    h2 { font-size: 1.45rem; color: var(--blue); margin-top: 0; }
+    p { margin: 0 0 14px; }
+    a { color: var(--blue); }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.98em;
+      background: #f1f4f8;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    .goal {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--field);
+      border: 1px solid #b8e1c7;
+      font-weight: 700;
+    }
+    .lecture-icons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .cue {
+      width: 42px;
+      height: 42px;
+      border: 1px solid #cbd8e7;
+      border-radius: 8px;
+      background: #f7fbff;
+      display: grid;
+      place-items: center;
+      animation: calm-float 5.5s ease-in-out infinite;
+    }
+    .cue:nth-child(2) { animation-delay: .5s; }
+    .cue:nth-child(3) { animation-delay: 1s; }
+    .cue:nth-child(4) { animation-delay: 1.5s; }
+    .cue-block::before,
+    .task-icon-block::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.42) 1px, transparent 1px) 0 0 / 11px 11px,
+        linear-gradient(0deg, rgba(255,255,255,.42) 1px, transparent 1px) 0 0 / 11px 11px,
+        var(--gold);
+      border: 2px solid #9b650c;
+    }
+    .cue-split::before,
+    .step-icon-split::before {
+      content: "";
+      width: 22px;
+      height: 18px;
+      border-left: 6px solid var(--blue);
+      border-right: 6px solid var(--green);
+      border-radius: 5px;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.65);
+    }
+    .cue-plus::before,
+    .step-icon-plus::before {
+      content: "+";
+      color: var(--green);
+      font-size: 1.6rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .cue-check::before,
+    .step-icon-check::before {
+      content: "";
+      width: 15px;
+      height: 8px;
+      border-left: 4px solid var(--green);
+      border-bottom: 4px solid var(--green);
+      transform: rotate(-45deg);
+      margin-top: -3px;
+    }
+    section {
+      margin-top: 18px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+    .story {
+      display: grid;
+      grid-template-columns: 1.06fr .94fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .visual {
+      min-height: 280px;
+      border: 1px solid #b7dec3;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.42) 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(0deg, rgba(255,255,255,.42) 1px, transparent 1px) 0 0 / 48px 48px,
+        #dff3e5;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+    .chunk-board {
+      width: min(350px, 100%);
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 10px 24px rgba(20, 32, 51, .12);
+    }
+    .chunk-sum {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .chunk-box {
+      min-height: 70px;
+      border: 1px solid #cbd8e7;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: #f9fbfd;
+      font-weight: 900;
+      color: var(--blue);
+      animation: block-pop 4.8s ease-in-out infinite;
+    }
+    .chunk-box:nth-child(3) { animation-delay: .45s; color: var(--green); }
+    .chunk-plus {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--green);
+    }
+    .chunk-line {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 800;
+      text-align: center;
+    }
+    .chunk-arrow {
+      color: var(--green);
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .step {
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f9fbfd;
+    }
+    .step-icon,
+    .task-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 9px;
+      background: #eef7ff;
+      border: 1px solid #c8dced;
+      color: var(--blue);
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+    .step strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green);
+    }
+    .workshop {
+      border-left: 5px solid var(--gold);
+      background: #fff8e9;
+    }
+    .workshop-layout {
+      display: grid;
+      grid-template-columns: 1.04fr .96fr;
+      gap: 18px;
+      align-items: center;
+    }
+    .workshop-steps {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 14px;
+      padding: 0;
+      list-style: none;
+    }
+    .workshop-steps li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px;
+      border: 1px solid #efd49c;
+      border-radius: 8px;
+      background: rgba(255,255,255,.62);
+    }
+    .workshop-step-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold);
+      color: #432800;
+      font-weight: 900;
+      font-size: .84rem;
+    }
+    .chunk-stage {
+      min-height: 390px;
+      border: 1px solid #f2d08c;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(178,107,0,.1) 1px, transparent 1px) 0 0 / 34px 34px,
+        linear-gradient(180deg, #fffdf7 0%, #fff7df 100%);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 6px rgba(255,255,255,.54);
+    }
+    .chunk-top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: stretch;
+      position: relative;
+      z-index: 5;
+    }
+    .chunk-start {
+      min-width: 88px;
+      padding-inline: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--green);
+      color: white;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(22, 118, 79, .18);
+    }
+    .chunk-start:hover { background: #115c3e; }
+    .chunk-readout,
+    .chunk-dial-card,
+    .chunk-result {
+      border: 1px solid #d9a849;
+      border-radius: 8px;
+      background: white;
+      padding: 12px 10px;
+      text-align: center;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(178, 107, 0, .12);
+    }
+    .chunk-readout small,
+    .chunk-dial-card small,
+    .chunk-result small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .72rem;
+    }
+    .chunk-breaker {
+      margin-top: 18px;
+      min-height: 190px;
+      display: grid;
+      grid-template-rows: 58px 38px 72px;
+      gap: 9px;
+      align-items: center;
+      justify-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    .chunk-big-number {
+      width: min(150px, 74%);
+      min-height: 54px;
+      border: 3px solid #9b650c;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.26) 1px, transparent 1px) 0 0 / 22px 22px,
+        linear-gradient(0deg, rgba(255,255,255,.26) 1px, transparent 1px) 0 0 / 22px 22px,
+        var(--gold);
+      color: #432800;
+      display: grid;
+      place-items: center;
+      font-size: 1.85rem;
+      font-weight: 900;
+      box-shadow: 0 9px 0 #c68416, 0 16px 18px rgba(67, 40, 0, .18);
+      position: relative;
+      transform-origin: center bottom;
+    }
+    .chunk-big-number::before,
+    .chunk-big-number::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 9px;
+      width: 3px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(67, 40, 0, .52);
+      opacity: 0;
+    }
+    .chunk-big-number::before { transform: translateX(-7px) rotate(24deg); }
+    .chunk-big-number::after { transform: translateX(8px) rotate(-22deg); }
+    .chunk-breaker-core {
+      width: min(230px, 92%);
+      min-height: 38px;
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .chunk-roller {
+      height: 28px;
+      border: 3px solid #0f4778;
+      border-radius: 999px;
+      background:
+        repeating-linear-gradient(90deg, #1f5e9d 0 9px, #d9ecff 9px 13px);
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.28);
+    }
+    .chunk-break-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff8e9;
+      border: 2px solid #d9a849;
+      color: var(--green);
+      font-size: 1.55rem;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(178, 107, 0, .14);
+    }
+    .chunk-outputs {
+      width: min(280px, 96%);
+      display: grid;
+      grid-template-columns: 1.35fr auto .8fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .chunk-output {
+      min-height: 58px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 1.45rem;
+      font-weight: 900;
+      box-shadow: 0 10px 18px rgba(20, 32, 51, .14);
+      opacity: .28;
+      transform: translateY(-12px) scale(.86);
+    }
+    .chunk-output-large {
+      background: var(--blue);
+      border: 2px solid #0f4778;
+    }
+    .chunk-output-small {
+      background: var(--green);
+      border: 2px solid #0f5d3d;
+    }
+    .chunk-output-plus {
+      color: var(--green);
+      font-size: 1.6rem;
+      font-weight: 900;
+      opacity: .42;
+      transform: scale(.9);
+    }
+    .chunk-stage-run .chunk-big-number {
+      animation: chunk-break 1.1s ease-in-out both;
+    }
+    .chunk-stage-run .chunk-big-number::before,
+    .chunk-stage-run .chunk-big-number::after {
+      animation: crack-show 1.1s ease-in-out both;
+    }
+    .chunk-stage-run .chunk-roller {
+      animation: roller-turn .75s ease-in-out 2;
+    }
+    .chunk-stage-run .chunk-break-mark {
+      animation: breaker-stamp .7s ease-in-out both;
+      animation-delay: .18s;
+    }
+    .chunk-stage-run .chunk-output {
+      animation: chunk-output-pop .65s ease-out both;
+      animation-delay: .82s;
+    }
+    .chunk-stage-run .chunk-output-small { animation-delay: .94s; }
+    .chunk-stage-run .chunk-output-plus {
+      animation: answer-rise .4s ease both;
+      animation-delay: 1.05s;
+    }
+    .chunk-track {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .chunk-machine-row {
+      display: grid;
+      grid-template-columns: 82px 1fr 70px;
+      gap: 10px;
+      align-items: center;
+      position: relative;
+    }
+    .chunk-label {
+      font-size: .78rem;
+      font-weight: 900;
+      color: var(--muted);
+    }
+    .chunk-piece {
+      min-height: 54px;
+      border: 2px solid #d9a849;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: white;
+      color: var(--blue);
+      font-weight: 900;
+      transform-origin: left center;
+    }
+    .chunk-answer {
+      min-height: 54px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #edf8f2;
+      color: var(--green);
+      border: 1px solid #acd7bd;
+      font-weight: 900;
+      opacity: .2;
+      transform: translateY(6px);
+    }
+    .chunk-stage-run .chunk-piece {
+      animation: chunk-slide 1.1s ease both;
+      animation-delay: calc(var(--i) * .35s);
+    }
+    .chunk-stage-run .chunk-answer {
+      animation: answer-rise .55s ease both;
+      animation-delay: calc(.75s + var(--i) * .35s);
+    }
+    .chunk-plus-result {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.76);
+      border: 1px dashed #d9a849;
+      text-align: center;
+      font-weight: 900;
+      color: var(--green);
+    }
+    .examples {
+      display: grid;
+      gap: 12px;
+    }
+    .example {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fbfd;
+    }
+    .example strong { color: var(--green); }
+    .task-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .task {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fbfd;
+      transition: transform .16s ease, border-color .16s ease;
+    }
+    .task:hover {
+      transform: translateY(-1px);
+      border-color: #aac2da;
+    }
+    .task label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-weight: 700;
+    }
+    .answer-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    input {
+      min-width: 120px;
+      flex: 1 1 160px;
+      padding: 10px 12px;
+      border: 1px solid #b8c4d1;
+      border-radius: 8px;
+      font: inherit;
+      font-weight: 700;
+    }
+    button[data-answer] {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: var(--blue);
+      color: white;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button[data-answer]:hover { background: #174c80; }
+    .feedback {
+      min-height: 1.5em;
+      margin: 9px 0 0;
+      font-weight: 800;
+    }
+    .feedback.ok { color: var(--green); }
+    .feedback.no { color: var(--red); }
+    .feedback.celebrate { animation: pop .42s ease; }
+    .tiny {
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: #eef7ff;
+      border: 1px solid #c8dced;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .sources { margin: 0; padding-left: 1.25rem; }
+    @keyframes calm-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes block-pop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    @keyframes chunk-slide {
+      0% { transform: translateX(0) scaleX(1); }
+      45% { transform: translateX(18px) scaleX(.86); }
+      100% { transform: translateX(0) scaleX(1); }
+    }
+    @keyframes chunk-break {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      22% { transform: translateY(8px) rotate(-1.5deg) scale(1.02); }
+      38% { transform: translateY(12px) rotate(1.5deg) scale(.98); }
+      60% { opacity: 1; transform: translateY(24px) rotate(0deg) scale(.9); }
+      100% { opacity: .08; transform: translateY(42px) scale(.64); }
+    }
+    @keyframes crack-show {
+      0%, 24% { opacity: 0; }
+      34%, 72% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes roller-turn {
+      0% { background-position: 0 0; transform: scaleY(1); }
+      50% { transform: scaleY(.88); }
+      100% { background-position: 44px 0; transform: scaleY(1); }
+    }
+    @keyframes breaker-stamp {
+      0% { transform: translateY(-2px) scale(.92); }
+      45% { transform: translateY(5px) scale(1.08); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes chunk-output-pop {
+      0% { opacity: .15; transform: translateY(-16px) scale(.72); }
+      72% { opacity: 1; transform: translateY(2px) scale(1.05); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes answer-rise {
+      from { opacity: .2; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 760px) {
+      header, section { padding: 20px; }
+      .story, .steps, .workshop-layout { grid-template-columns: 1fr; }
+      .visual { min-height: 220px; }
+      .chunk-stage { min-height: 560px; }
+    }
+    @media (max-width: 430px) {
+      .chunk-stage { padding: 12px; }
+      .chunk-top { gap: 6px; }
+      .chunk-start {
+        min-width: 72px;
+        padding-inline: 8px;
+        font-size: .82rem;
+      }
+      .chunk-machine-row {
+        grid-template-columns: 66px 1fr 58px;
+        gap: 7px;
+      }
+      .chunk-label { font-size: .66rem; }
+      .chunk-piece,
+      .chunk-answer {
+        min-height: 48px;
+        font-size: .86rem;
+      }
+      .chunk-breaker {
+        min-height: 180px;
+        grid-template-rows: 52px 34px 68px;
+      }
+      .chunk-big-number {
+        min-height: 48px;
+        font-size: 1.45rem;
+      }
+      .chunk-breaker-core {
+        grid-template-columns: 1fr 34px 1fr;
+        gap: 6px;
+      }
+      .chunk-roller { height: 24px; }
+      .chunk-break-mark {
+        width: 34px;
+        height: 34px;
+        font-size: 1.35rem;
+      }
+      .chunk-outputs { gap: 7px; }
+      .chunk-output {
+        min-height: 50px;
+        font-size: 1.15rem;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+    @media print {
+      body { background: white; }
+      main { width: auto; margin: 0; }
+      header, section { break-inside: avoid; }
+      button, input { border: 1px solid #777; color: black; background: white; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Division: Große Zahlen zerlegen</h1>
+    <p>Große Geteilt-Aufgaben werden leichter, wenn du die Zahl in passende Teile zerlegst. Dann teilst du die Teile einzeln und rechnest die Ergebnisse zusammen.</p>
+    <p class="goal">Gewinn des Tages: <code>654 : 6</code> als <code>600 : 6</code> und <code>54 : 6</code> lösen.</p>
+    <div class="lecture-icons" aria-hidden="true">
+      <span class="cue cue-block"></span>
+      <span class="cue cue-split"></span>
+      <span class="cue cue-plus"></span>
+      <span class="cue cue-check"></span>
+    </div>
+  </header>
+
+  <section class="story" aria-labelledby="warmup">
+    <div>
+      <h2 id="warmup">1. Aus einer schweren Aufgabe werden zwei leichte</h2>
+      <p>In der Schule kommt so etwas vor: <code>654 : 6</code>.</p>
+      <p>Das sieht groß aus. Aber du darfst die Zahl in freundliche Teile zerlegen:</p>
+      <p><code>654 = 600 + 54</code></p>
+      <p>Jetzt wird es übersichtlich: <code>600 : 6 = 100</code> und <code>54 : 6 = 9</code>.</p>
+      <p>Zum Schluss rechnest du zusammen: <code>100 + 9 = 109</code>.</p>
+      <p>Also: <code>654 : 6 = 109</code>. Probe: <code>109 x 6 = 654</code>.</p>
+    </div>
+    <div class="visual" aria-hidden="true">
+      <div class="chunk-board">
+        <div class="chunk-sum">
+          <div class="chunk-box">600</div>
+          <div class="chunk-plus">+</div>
+          <div class="chunk-box">54</div>
+        </div>
+        <div class="chunk-line">
+          <span>600 : 6 = 100</span>
+          <span class="chunk-arrow">+</span>
+          <span>54 : 6 = 9</span>
+        </div>
+        <div class="chunk-line">
+          <span>100</span>
+          <span class="chunk-arrow">+</span>
+          <span>9 = 109</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="steps">
+    <h2 id="steps">2. Der Zerlege-Trick in 3 Schritten</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-icon step-icon-split" aria-hidden="true"></span>
+        <strong>Passende Teile suchen</strong>
+        <p>Zerlege so, dass beide Teile gut durch die kleine Zahl teilbar sind.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon step-icon-plus" aria-hidden="true"></span>
+        <strong>Teile teilen</strong>
+        <p>Rechne jede kleine Division einzeln. Schreibe sauber untereinander.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon step-icon-check" aria-hidden="true"></span>
+        <strong>Zusammen und Probe</strong>
+        <p>Addiere die Ergebnisse. Dann prüfst du mit <code>Ergebnis x Teiler</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="workshop" aria-labelledby="workshop">
+    <h2 id="workshop">3. Erfinderlabor: Zahlen-Zerleger</h2>
+    <div class="workshop-layout">
+      <div>
+        <p>Die Maschine nimmt eine große Zahl und macht daraus zwei freundlichere Stücke.</p>
+        <ol class="workshop-steps">
+          <li><span class="workshop-step-number">1</span><span><strong>Gesamtzahl:</strong> 654 kommt oben in die Maschine.</span></li>
+          <li><span class="workshop-step-number">2</span><span><strong>Zerlegen:</strong> Die Maschine baut <code>600 + 54</code>.</span></li>
+          <li><span class="workshop-step-number">3</span><span><strong>Teilen:</strong> Beide Stücke werden durch 6 geteilt.</span></li>
+        </ol>
+        <p>Wichtig: <strong>Die Teile müssen zusammen wieder die Startzahl ergeben.</strong></p>
+        <p class="tiny">Du musst nicht immer Hunderter nehmen. Nimm Teile, die gut zur Aufgabe passen.</p>
+      </div>
+      <div class="chunk-stage" data-chunk-stage>
+        <div class="chunk-top">
+          <div class="chunk-readout">654<small>Startzahl</small></div>
+          <button type="button" class="chunk-start" data-chunk-start>Starten</button>
+          <div class="chunk-dial-card">: 6<small>Teiler</small></div>
+        </div>
+        <div class="chunk-breaker" aria-hidden="true">
+          <div class="chunk-big-number">654</div>
+          <div class="chunk-breaker-core">
+            <span class="chunk-roller chunk-roller-left"></span>
+            <span class="chunk-break-mark">+</span>
+            <span class="chunk-roller chunk-roller-right"></span>
+          </div>
+          <div class="chunk-outputs">
+            <span class="chunk-output chunk-output-large">600</span>
+            <span class="chunk-output-plus">+</span>
+            <span class="chunk-output chunk-output-small">54</span>
+          </div>
+        </div>
+        <div class="chunk-track" aria-hidden="true">
+          <div class="chunk-machine-row">
+            <span class="chunk-label">Teil 1</span>
+            <span class="chunk-piece" style="--i: 0">600 : 6</span>
+            <span class="chunk-answer" style="--i: 0">100</span>
+          </div>
+          <div class="chunk-machine-row">
+            <span class="chunk-label">Teil 2</span>
+            <span class="chunk-piece" style="--i: 1">54 : 6</span>
+            <span class="chunk-answer" style="--i: 1">9</span>
+          </div>
+          <div class="chunk-plus-result">100 + 9 = 109</div>
+        </div>
+        <div class="chunk-result">
+          <strong>109</strong>
+          <small>Probe: 109 x 6 = 654</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="school">
+    <h2 id="school">4. Genau solche Schulaufgaben</h2>
+    <div class="examples">
+      <div class="example">
+        <strong><code>294 : 3</code></strong>
+        <p><code>294 = 270 + 24</code></p>
+        <p><code>270 : 3 = 90</code> und <code>24 : 3 = 8</code>. Also <code>294 : 3 = 98</code>.</p>
+      </div>
+      <div class="example">
+        <strong><code>304 : 4</code></strong>
+        <p><code>304 = 280 + 24</code></p>
+        <p><code>280 : 4 = 70</code> und <code>24 : 4 = 6</code>. Also <code>304 : 4 = 76</code>.</p>
+      </div>
+      <div class="example">
+        <strong>Wenn du festhängst</strong>
+        <p>Zerlege nicht in Teile, die wieder schwer sind. Bei <code>304 : 4</code> ist <code>300 : 4</code> unbequem. <code>280 : 4</code> und <code>24 : 4</code> sind viel freundlicher.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="practice">
+    <h2 id="practice">5. Mini-Training</h2>
+    <p>Schreibe nur die Ergebniszahl in das Feld. Danach prüft die Seite sofort.</p>
+    <div class="task-list">
+      <div class="task">
+        <label for="q1"><span class="task-icon task-icon-block" aria-hidden="true"></span><span>Fußball: 486 Sticker werden auf 6 Sammelhefte verteilt. <code>486 : 6 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q1" inputmode="numeric" autocomplete="off" aria-label="Antwort zu 486 geteilt durch 6">
+          <button type="button" data-answer="81" data-input="q1" data-feedback="f1" data-proof="81 x 6 = 486">Prüfen</button>
+        </div>
+        <p id="f1" class="feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="task">
+        <label for="q2"><span class="task-icon task-icon-block" aria-hidden="true"></span><span>Mario-Level: 639 Münzen liegen gleichmäßig in 3 Welten. <code>639 : 3 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q2" inputmode="numeric" autocomplete="off" aria-label="Antwort zu 639 geteilt durch 3">
+          <button type="button" data-answer="213" data-input="q2" data-feedback="f2" data-proof="213 x 3 = 639">Prüfen</button>
+        </div>
+        <p id="f2" class="feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="task">
+        <label for="q3"><span class="task-icon task-icon-block" aria-hidden="true"></span><span>Erfinderteile: 848 Zahnräder werden in 4 gleiche Kisten gelegt. <code>848 : 4 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q3" inputmode="numeric" autocomplete="off" aria-label="Antwort zu 848 geteilt durch 4">
+          <button type="button" data-answer="212" data-input="q3" data-feedback="f3" data-proof="212 x 4 = 848">Prüfen</button>
+        </div>
+        <p id="f3" class="feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="task">
+        <label for="q4"><span class="task-icon task-icon-block" aria-hidden="true"></span><span>Training: 735 Hütchen werden auf 7 Stationen verteilt. <code>735 : 7 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q4" inputmode="numeric" autocomplete="off" aria-label="Antwort zu 735 geteilt durch 7">
+          <button type="button" data-answer="105" data-input="q4" data-feedback="f4" data-proof="105 x 7 = 735">Prüfen</button>
+        </div>
+        <p id="f4" class="feedback" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="say">
+    <h2 id="say">6. Sag es laut</h2>
+    <p>Bei jeder großen Aufgabe sagst du:</p>
+    <p><code>Ich zerlege die Zahl in passende Teile. Ich teile beide Teile. Dann rechne ich die Ergebnisse zusammen.</code></p>
+    <p>Beispiel: Ich zerlege 654 in 600 und 54. 600 geteilt durch 6 ist 100. 54 geteilt durch 6 ist 9. Zusammen sind das 109.</p>
+  </section>
+
+  <section aria-labelledby="next">
+    <h2 id="next">Nächstes Mal</h2>
+    <p>Wenn das klappt, kann der nächste Schritt sein: dieselbe Zerlege-Idee bei Aufgaben mit Rest benutzen oder mit der schriftlichen Division vergleichen.</p>
+    <div class="nav">
+      <a href="./0002-division-mit-rest.html">Zur zweiten Lektion</a>
+      <a href="../reference/division-merkblatt.html">Merkblatt zur Division öffnen</a>
+    </div>
+    <p>Frag den Agenten nach mehr Aufgaben, wenn eine Stelle unklar ist oder wenn du ein neues Fußball-, Erfinder- oder Mario-Beispiel rechnen willst.</p>
+  </section>
+
+  <section aria-labelledby="sources">
+    <h2 id="sources">Quellen</h2>
+    <ul class="sources">
+      <li><a href="https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2022/2022_06_23-Bista-Primarbereich-Mathe.pdf">KMK Bildungsstandards Mathematik Primarbereich, 2022</a></li>
+      <li><a href="https://de.khanacademy.org/math/arithmetic/arith-review-multiply-divide">Khan Academy Deutsch: Multiplizieren und Dividieren</a></li>
+    </ul>
+  </section>
+</main>
+
+<script>
+  const chunkStage = document.querySelector("[data-chunk-stage]");
+  const chunkStart = document.querySelector("[data-chunk-start]");
+  if (chunkStage && chunkStart) {
+    chunkStart.addEventListener("click", () => {
+      chunkStage.classList.remove("chunk-stage-run");
+      void chunkStage.offsetWidth;
+      chunkStage.classList.add("chunk-stage-run");
+      chunkStart.textContent = "Noch einmal";
+    });
+  }
+
+  const buttons = document.querySelectorAll("button[data-answer]");
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.getElementById(button.dataset.input);
+      const feedback = document.getElementById(button.dataset.feedback);
+      const value = input.value.trim();
+      const correct = value === button.dataset.answer;
+      feedback.classList.remove("celebrate");
+      void feedback.offsetWidth;
+      if (correct) {
+        feedback.className = "feedback ok";
+        feedback.textContent = `Richtig. Probe: ${button.dataset.proof}.`;
+        feedback.classList.add("celebrate");
+      } else {
+        feedback.className = "feedback no";
+        feedback.textContent = "Fast. Zerlege die große Zahl in passende Teile und rechne danach zusammen.";
+      }
+    });
+  });
+</script>
+</body>
+</html>

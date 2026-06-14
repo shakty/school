@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -9,6 +9,19 @@ const lessonOne = readFileSync(
 );
 const lessonTwo = readFileSync(
   join(__dirname, "..", "lessons", "0002-division-mit-rest.html"),
+  "utf8",
+);
+const lessonThreePath = join(
+  __dirname,
+  "..",
+  "lessons",
+  "0003-grosse-zahlen-zerlegen.html",
+);
+const lessonThree = existsSync(lessonThreePath)
+  ? readFileSync(lessonThreePath, "utf8")
+  : "";
+const reference = readFileSync(
+  join(__dirname, "..", "reference", "division-merkblatt.html"),
   "utf8",
 );
 
@@ -98,14 +111,68 @@ const expectations = [
     check: () => ["4r1", "5r1", "5r4"].every((answer) => lessonTwo.includes(`data-answer="${answer}"`)),
   },
   {
+    name: "lecture 3 exists for splitting large division numbers",
+    check: () => lessonThree.length > 0,
+  },
+  {
+    name: "lecture 3 teaches the listed school examples",
+    check: () => ["654 : 6", "294 : 3", "304 : 4"].every((example) => lessonThree.includes(example)),
+  },
+  {
+    name: "lecture 3 shows chunk splitting with hundreds and remainder-friendly parts",
+    check: () => ["600 : 6 = 100", "54 : 6 = 9", "100 + 9 = 109"].every((part) => lessonThree.includes(part)),
+  },
+  {
+    name: "lecture 3 has a replayable chunk machine",
+    check: () => lessonThree.includes("data-chunk-stage") && lessonThree.includes("data-chunk-start"),
+  },
+  {
+    name: "lecture 3 chunk animation is wired",
+    check: () => lessonThree.includes("chunk-stage-run"),
+  },
+  {
+    name: "lecture 3 chunk animation starts from one visible big number block",
+    check: () => lessonThree.includes('class="chunk-big-number"') && lessonThree.includes(">654<"),
+  },
+  {
+    name: "lecture 3 chunk animation has a visible breaker machine",
+    check: () => lessonThree.includes('class="chunk-breaker"') && lessonThree.includes('class="chunk-roller'),
+  },
+  {
+    name: "lecture 3 chunk animation breaks the number into two colored output blocks",
+    check: () =>
+      lessonThree.includes('class="chunk-output chunk-output-large"') &&
+      lessonThree.includes('class="chunk-output chunk-output-small"'),
+  },
+  {
+    name: "lecture 3 uses compact icon labels for the new three-step trick",
+    check: () => (lessonThree.match(/class="step-icon(?:\s|")/g) ?? []).length >= 3,
+  },
+  {
+    name: "lecture 3 quiz covers clean multi-digit division answers",
+    check: () => ["81", "213", "212", "105"].every((answer) => lessonThree.includes(`data-answer="${answer}"`)),
+  },
+  {
+    name: "lecture 2 links forward to lecture 3",
+    check: () => lessonTwo.includes("./0003-grosse-zahlen-zerlegen.html"),
+  },
+  {
+    name: "reference links to lecture 3",
+    check: () => reference.includes("../lessons/0003-grosse-zahlen-zerlegen.html"),
+  },
+  {
     name: "motion respects reduced-motion preferences",
-    check: () => lessonOne.includes("@media (prefers-reduced-motion: reduce)") && lessonTwo.includes("@media (prefers-reduced-motion: reduce)"),
+    check: () =>
+      lessonOne.includes("@media (prefers-reduced-motion: reduce)") &&
+      lessonTwo.includes("@media (prefers-reduced-motion: reduce)") &&
+      lessonThree.includes("@media (prefers-reduced-motion: reduce)"),
   },
   {
     name: "decorative visuals stay out of the accessibility tree",
     check: () =>
       (lessonOne.match(/aria-hidden="true"/g) ?? []).length >= 4 &&
-      (lessonTwo.match(/aria-hidden="true"/g) ?? []).length >= 4,
+      (lessonTwo.match(/aria-hidden="true"/g) ?? []).length >= 4 &&
+      (lessonThree.match(/aria-hidden="true"/g) ?? []).length >= 4,
   },
 ];
 

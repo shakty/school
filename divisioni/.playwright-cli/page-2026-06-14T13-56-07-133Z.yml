@@ -1,0 +1,162 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - 'heading "Division: Teilen wie ein Team" [level=1] [ref=e4]'
+    - paragraph [ref=e5]: "Heute lernst du einen starken Trick: Eine Division ist eine faire Verteilung. Wenn du unsicher bist, prüfst du sie mit einer Mal-Aufgabe."
+    - paragraph [ref=e6]:
+      - text: "Gewinn des Tages:"
+      - code [ref=e7]: geteilt
+      - text: rückwärts mit
+      - code [ref=e8]: mal
+      - text: kontrollieren.
+    - generic [ref=e11]: ÷
+  - region "1. Stell dir ein Fußballtraining vor" [ref=e14]:
+    - generic [ref=e15]:
+      - heading "1. Stell dir ein Fußballtraining vor" [level=2] [ref=e16]
+      - paragraph [ref=e17]:
+        - text: Der Trainer hat
+        - strong [ref=e18]: 24 Bälle
+        - text: . Es gibt
+        - strong [ref=e19]: 6 Teams
+        - text: . Jedes Team soll gleich viele Bälle bekommen.
+      - paragraph [ref=e20]:
+        - text: "Die Frage ist:"
+        - code [ref=e21]: "24 : 6 = ?"
+      - paragraph [ref=e22]:
+        - text: "Denke rückwärts:"
+        - strong [ref=e23]: Welche Zahl mal 6 ergibt 24?
+      - paragraph [ref=e24]:
+        - code [ref=e25]: 4 x 6 = 24
+        - text: ", also ist"
+        - code [ref=e26]: "24 : 6 = 4"
+        - text: .
+    - generic [ref=e28]:
+      - generic [ref=e30]: Team 1
+      - generic [ref=e37]: Team 2
+      - generic [ref=e44]: Team 3
+      - generic [ref=e51]: Team 4
+      - generic [ref=e58]: Team 5
+      - generic [ref=e65]: Team 6
+  - region "2. Der 3-Schritt-Trick" [ref=e71]:
+    - heading "2. Der 3-Schritt-Trick" [level=2] [ref=e72]
+    - generic [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]: ÷
+        - strong [ref=e76]: Teilen
+        - paragraph [ref=e77]: Was wird verteilt? Zum Beispiel 24 Bälle.
+      - generic [ref=e78]:
+        - strong [ref=e80]: Gruppen
+        - paragraph [ref=e81]: Auf wie viele Gruppen? Zum Beispiel 6 Teams.
+      - generic [ref=e82]:
+        - strong [ref=e84]: Probe
+        - paragraph [ref=e85]:
+          - text: Passt die Mal-Aufgabe?
+          - code [ref=e86]: 4 x 6 = 24
+          - text: .
+  - region "3. Erfinderlabor-Maschine" [ref=e87]:
+    - heading "3. Erfinderlabor-Maschine" [level=2] [ref=e88]
+    - generic [ref=e89]:
+      - generic [ref=e90]:
+        - paragraph [ref=e91]: "Stell dir eine Woozle-Goozle-artige Erfindermaschine vor. Sie macht immer drei Dinge nacheinander:"
+        - list [ref=e92]:
+          - listitem [ref=e93]:
+            - generic [ref=e94]: "1"
+            - generic [ref=e95]:
+              - strong [ref=e96]: "Gesamtzahl hinein:"
+              - text: 30 Münzen starten oben.
+          - listitem [ref=e97]:
+            - generic [ref=e98]: "2"
+            - generic [ref=e99]:
+              - strong [ref=e100]: "Gruppen einstellen:"
+              - text: Das Rad steht auf 5 Level.
+          - listitem [ref=e101]:
+            - generic [ref=e102]: "3"
+            - generic [ref=e103]:
+              - strong [ref=e104]: "Gleich verteilen:"
+              - text: Jedes Level bekommt 6 Münzen.
+        - paragraph [ref=e105]:
+          - text: "Beispiel:"
+          - code [ref=e106]: "30 Münzen : 5 Level = 6 Münzen pro Level"
+          - text: .
+        - paragraph [ref=e107]:
+          - text: "Maschinen-Test: Wenn unten 6 herauskommt und es 5 Level gibt, muss"
+          - code [ref=e108]: 6 x 5 = 30
+          - text: stimmen.
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - text: "30"
+            - generic [ref=e112]: Münzen oben
+          - button "Noch einmal" [active] [ref=e218] [cursor=pointer]
+          - generic [ref=e114]:
+            - text: "5"
+            - generic [ref=e115]: Level eingestellt
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - generic [ref=e120]: Level 1
+            - generic [ref=e121]: 6 Münzen
+          - generic [ref=e122]:
+            - generic [ref=e123]: Level 2
+            - generic [ref=e124]: 6 Münzen
+          - generic [ref=e125]:
+            - generic [ref=e126]: Level 3
+            - generic [ref=e127]: 6 Münzen
+          - generic [ref=e128]:
+            - generic [ref=e129]: Level 4
+            - generic [ref=e130]: 6 Münzen
+          - generic [ref=e131]:
+            - generic [ref=e132]: Level 5
+            - generic [ref=e133]: 6 Münzen
+        - generic [ref=e134]:
+          - strong [ref=e135]: "6"
+          - generic [ref=e136]: Münzen pro Level
+          - generic [ref=e137]: "Probe: 6 x 5 = 30"
+  - region "4. Mini-Training" [ref=e168]:
+    - heading "4. Mini-Training" [level=2] [ref=e169]
+    - paragraph [ref=e170]: Schreibe nur die Ergebniszahl in das Feld. Danach prüft die Seite sofort.
+    - generic [ref=e171]:
+      - generic [ref=e172]:
+        - generic [ref=e175]:
+          - text: "Fußball: 18 Leibchen werden auf 3 Teams verteilt."
+          - code [ref=e176]: "18 : 3 = ?"
+        - generic [ref=e177]:
+          - 'textbox "Fußball: 18 Leibchen werden auf 3 Teams verteilt. 18 : 3 = ?" [ref=e178]'
+          - button "Prüfen" [ref=e179] [cursor=pointer]
+        - paragraph [ref=e180]
+      - generic [ref=e181]:
+        - generic [ref=e184]:
+          - text: "Mario-Level: 32 Münzen liegen gleichmäßig in 4 Leveln."
+          - code [ref=e185]: "32 : 4 = ?"
+        - generic [ref=e186]:
+          - 'textbox "Mario-Level: 32 Münzen liegen gleichmäßig in 4 Leveln. 32 : 4 = ?" [ref=e187]'
+          - button "Prüfen" [ref=e188] [cursor=pointer]
+        - paragraph [ref=e189]
+      - generic [ref=e190]:
+        - generic [ref=e193]:
+          - text: "Erfinderteile: 45 Schrauben werden in 5 gleiche Kisten gelegt."
+          - code [ref=e194]: "45 : 5 = ?"
+        - generic [ref=e195]:
+          - 'textbox "Erfinderteile: 45 Schrauben werden in 5 gleiche Kisten gelegt. 45 : 5 = ?" [ref=e196]'
+          - button "Prüfen" [ref=e197] [cursor=pointer]
+        - paragraph [ref=e198]
+  - region "5. Sag es laut" [ref=e199]:
+    - heading "5. Sag es laut" [level=2] [ref=e200]
+    - paragraph [ref=e201]: "Für jede Aufgabe sagst du:"
+    - paragraph [ref=e202]:
+      - code [ref=e203]: Ich teile ___ Dinge auf ___ Gruppen. Jede Gruppe bekommt ___. Die Probe ist ___ mal ___.
+    - paragraph [ref=e204]: "Beispiel: Ich teile 24 Bälle auf 6 Teams. Jedes Team bekommt 4. Die Probe ist 4 mal 6."
+  - region "Nächstes Mal" [ref=e205]:
+    - heading "Nächstes Mal" [level=2] [ref=e206]
+    - paragraph [ref=e207]: "Wenn das klappt, ist der nächste kleine Schritt: Division mit Rest. Beispiel: 14 Pilze auf 3 Mario-Level verteilen."
+    - paragraph [ref=e208]:
+      - link "Merkblatt zur Division öffnen" [ref=e209] [cursor=pointer]:
+        - /url: ../reference/division-merkblatt.html
+    - paragraph [ref=e210]: Frag den Agenten nach mehr Aufgaben, wenn eine Stelle unklar ist oder wenn du ein neues Fußball- oder Mario-Level rechnen willst.
+  - region "Quellen" [ref=e211]:
+    - heading "Quellen" [level=2] [ref=e212]
+    - list [ref=e213]:
+      - listitem [ref=e214]:
+        - link "KMK Bildungsstandards Mathematik Primarbereich, 2022" [ref=e215] [cursor=pointer]:
+          - /url: https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2022/2022_06_23-Bista-Primarbereich-Mathe.pdf
+      - listitem [ref=e216]:
+        - 'link "Khan Academy Deutsch: Multiplizieren und Dividieren" [ref=e217] [cursor=pointer]':
+          - /url: https://de.khanacademy.org/math/arithmetic/arith-review-multiply-divide

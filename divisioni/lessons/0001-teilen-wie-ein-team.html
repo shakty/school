@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Division 1: Teilen wie ein Team</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #142033;
+      --muted: #566276;
+      --line: #d7dee8;
+      --paper: #fffefa;
+      --field: #e8f6ed;
+      --sky: #edf6ff;
+      --gold: #f2b544;
+      --blue: #1f5e9d;
+      --green: #16764f;
+      --red: #b43b3b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #eaf4ff 0%, #f8fbff 38%, #eef7f0 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      width: min(920px, calc(100vw - 28px));
+      margin: 22px auto 40px;
+    }
+    header {
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
+    h1, h2, h3 { line-height: 1.15; margin: 0 0 12px; }
+    h1 { font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: 0; }
+    h2 { font-size: 1.45rem; color: var(--blue); margin-top: 0; }
+    p { margin: 0 0 14px; }
+    a { color: var(--blue); }
+    .goal {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--field);
+      border: 1px solid #b8e1c7;
+      font-weight: 700;
+    }
+    .lecture-icons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .cue {
+      width: 42px;
+      height: 42px;
+      border: 1px solid #cbd8e7;
+      border-radius: 8px;
+      background: #f7fbff;
+      display: grid;
+      place-items: center;
+      position: relative;
+      animation: calm-float 5.5s ease-in-out infinite;
+    }
+    .cue:nth-child(2) { animation-delay: .5s; }
+    .cue:nth-child(3) { animation-delay: 1s; }
+    .cue:nth-child(4) { animation-delay: 1.5s; }
+    .cue-ball::before,
+    .mini-ball,
+    .task-icon-ball::before {
+      content: "";
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 34% 32%, white 0 11%, transparent 12%),
+        radial-gradient(circle at 62% 62%, #132237 0 10%, transparent 11%),
+        #f7f9fb;
+      border: 2px solid #132237;
+    }
+    .cue-ball::before {
+      width: 23px;
+      height: 23px;
+    }
+    .cue-coin::before,
+    .task-icon-coin::before {
+      content: "";
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd36f, var(--gold));
+      border: 2px solid #9b650c;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.32);
+    }
+    .cue-gear::before,
+    .task-icon-gear::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border: 5px solid var(--blue);
+      border-radius: 50%;
+      box-shadow:
+        0 -11px 0 -6px var(--blue),
+        0 11px 0 -6px var(--blue),
+        -11px 0 0 -6px var(--blue),
+        11px 0 0 -6px var(--blue);
+    }
+    .cue-divide::before {
+      content: "\00f7";
+      color: var(--green);
+      font-size: 1.7rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    section {
+      margin-top: 18px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+    .story {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .visual {
+      min-height: 210px;
+      border: 1px solid #b7dec3;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.44) 1px, transparent 1px) 0 0 / 54px 54px,
+        linear-gradient(0deg, rgba(255,255,255,.44) 1px, transparent 1px) 0 0 / 54px 54px,
+        #dff3e5;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+    .visual-field {
+      align-items: center;
+      justify-items: center;
+    }
+    .team-share-grid {
+      width: min(320px, 100%);
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 10px 24px rgba(20, 32, 51, .12);
+    }
+    .team-row {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .team-name {
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 800;
+    }
+    .ball-cluster {
+      display: grid;
+      grid-template-columns: repeat(4, 18px);
+      gap: 5px;
+      align-items: center;
+    }
+    .mini-ball {
+      width: 18px;
+      height: 18px;
+      display: block;
+      animation: ball-settle 4s ease-in-out infinite;
+    }
+    .team-row:nth-child(2n) .mini-ball { animation-delay: .35s; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .step {
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f9fbfd;
+    }
+    .step-icon,
+    .task-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 9px;
+      background: #eef7ff;
+      border: 1px solid #c8dced;
+      color: var(--blue);
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+    .step-icon-divide::before { content: "\00f7"; font-size: 1.45rem; }
+    .step-icon-groups::before {
+      content: "";
+      width: 20px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: -8px 7px 0 -2px #6fbf91, 8px 7px 0 -2px #6fbf91;
+    }
+    .step-icon-check::before {
+      content: "";
+      width: 15px;
+      height: 8px;
+      border-left: 4px solid var(--green);
+      border-bottom: 4px solid var(--green);
+      transform: rotate(-45deg);
+      margin-top: -3px;
+    }
+    .step strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green);
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.98em;
+      background: #f1f4f8;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    .machine {
+      border-left: 5px solid var(--gold);
+      background: #fff8e9;
+    }
+    .machine-layout {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 18px;
+      align-items: center;
+    }
+    .machine-steps {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 14px;
+      padding: 0;
+      list-style: none;
+    }
+    .machine-steps li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px;
+      border: 1px solid #efd49c;
+      border-radius: 8px;
+      background: rgba(255,255,255,.58);
+    }
+    .machine-step-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold);
+      color: #432800;
+      font-weight: 900;
+      font-size: .84rem;
+    }
+    .machine-stage {
+      min-height: 430px;
+      border: 1px solid #f2d08c;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(178,107,0,.1) 1px, transparent 1px) 0 0 / 34px 34px,
+        linear-gradient(180deg, #fffdf7 0%, #fff7df 100%);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 6px rgba(255,255,255,.54);
+    }
+    .machine-top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: stretch;
+      position: relative;
+      z-index: 5;
+    }
+    .machine-start {
+      min-width: 86px;
+      padding-inline: 12px;
+      background: var(--green);
+      box-shadow: 0 8px 18px rgba(22, 118, 79, .18);
+      align-self: stretch;
+    }
+    .machine-start:hover { background: #115c3e; }
+    .machine-readout,
+    .machine-dial-card,
+    .machine-result {
+      border: 1px solid #d9a849;
+      border-radius: 8px;
+      background: white;
+      padding: 12px 10px;
+      text-align: center;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(178, 107, 0, .12);
+    }
+    .machine-readout small,
+    .machine-dial-card small,
+    .machine-result small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .72rem;
+    }
+    .machine-dial-card {
+      position: relative;
+      padding-left: 42px;
+    }
+    .machine-dial-card::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      width: 21px;
+      height: 21px;
+      margin-top: -10px;
+      border: 5px solid var(--blue);
+      border-radius: 50%;
+      box-shadow:
+        0 -10px 0 -6px var(--blue),
+        0 10px 0 -6px var(--blue),
+        -10px 0 0 -6px var(--blue),
+        10px 0 0 -6px var(--blue);
+    }
+    .machine-stage-run .machine-dial-card::before {
+      animation: dial-turn 1.2s ease-in-out;
+    }
+    .machine-tray {
+      height: 74px;
+      margin: 12px 8px 0;
+      border: 1px solid rgba(217,168,73,.78);
+      border-radius: 8px;
+      background: rgba(255,255,255,.76);
+      position: relative;
+      z-index: 2;
+      box-shadow: inset 0 -8px 0 rgba(242,181,68,.12);
+    }
+    .machine-pipe {
+      width: 44px;
+      height: 48px;
+      margin: -2px auto 0;
+      border-left: 10px solid #f2c56b;
+      border-right: 10px solid #f2c56b;
+      border-bottom: 10px solid #f2c56b;
+      border-radius: 0 0 18px 18px;
+      position: relative;
+      z-index: 4;
+    }
+    .machine-lanes {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      align-items: end;
+      min-height: 138px;
+      margin-top: -3px;
+      position: relative;
+      z-index: 2;
+    }
+    .machine-lanes::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 0;
+      height: 4px;
+      border-radius: 999px;
+      background: #f2c56b;
+      box-shadow: 0 12px 0 rgba(242,197,107,.4);
+    }
+    .machine-lane {
+      min-height: 126px;
+      padding: 20px 4px 8px;
+      border: 1px solid rgba(217,168,73,.7);
+      border-radius: 8px;
+      background: rgba(255,255,255,.72);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 7px;
+    }
+    .machine-lane-label {
+      color: var(--blue);
+      font-size: .66rem;
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.1;
+    }
+    .machine-lane-hint {
+      color: var(--muted);
+      font-size: .58rem;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.1;
+    }
+    .machine-moving-coin {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      display: block;
+      background: linear-gradient(135deg, #ffe18c, var(--gold));
+      border: 2px solid #9b650c;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.3);
+      position: absolute;
+      left: var(--sx);
+      top: var(--sy);
+      opacity: 1;
+      z-index: 3;
+    }
+    .machine-stage-run .machine-moving-coin {
+      animation: machine-drop 2.9s cubic-bezier(.2,.72,.22,1) forwards;
+      animation-delay: calc(var(--i) * 42ms);
+    }
+    .machine-result {
+      margin-top: 12px;
+      background: #edf8f2;
+      border-color: #b8e1c7;
+      color: var(--green);
+      opacity: .48;
+      transform: translateY(4px);
+      position: relative;
+      z-index: 2;
+    }
+    .machine-stage-run .machine-result {
+      animation: result-readout 3.6s ease-out forwards;
+    }
+    .machine-result strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .machine-proof {
+      display: inline-block;
+      margin-top: 7px;
+      padding-top: 7px;
+      border-top: 1px solid #b8e1c7;
+      color: var(--ink);
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .quiz {
+      display: grid;
+      gap: 12px;
+    }
+    .task {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+    label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .task-icon {
+      width: 30px;
+      height: 30px;
+      margin-bottom: 0;
+      background: #fff8e9;
+      border-color: #efd49c;
+    }
+    .task-icon-ball::before,
+    .task-icon-coin::before,
+    .task-icon-gear::before {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .answer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    input {
+      width: 88px;
+      min-height: 42px;
+      border: 1px solid #aeb8c6;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 1.1rem;
+    }
+    button {
+      min-height: 42px;
+      border: 0;
+      border-radius: 6px;
+      padding: 9px 14px;
+      background: var(--blue);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:hover { background: #184f86; }
+    .feedback {
+      min-height: 26px;
+      margin: 10px 0 0;
+      font-weight: 700;
+    }
+    .feedback.celebrate { animation: feedback-pop .42s ease-out; }
+    .ok { color: var(--green); }
+    .no { color: var(--red); }
+    .tiny { color: var(--muted); font-size: .95rem; }
+    .sources li { margin-bottom: 8px; }
+    @keyframes calm-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes ball-settle {
+      0%, 100% { transform: translateY(0); }
+      45% { transform: translateY(-2px); }
+    }
+    @keyframes dial-turn {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(180deg); }
+    }
+    @keyframes machine-drop {
+      0% {
+        left: var(--sx);
+        top: var(--sy);
+        opacity: 1;
+        transform: scale(1);
+      }
+      38% {
+        left: calc(50% - 8px);
+        top: 156px;
+        opacity: .56;
+        transform: scale(.62);
+      }
+      58% {
+        left: calc(50% - 8px);
+        top: 196px;
+        opacity: .92;
+        transform: scale(.76);
+      }
+      100% {
+        left: var(--ex);
+        top: var(--ey);
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    @keyframes result-readout {
+      0%, 72% {
+        opacity: .48;
+        transform: translateY(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes feedback-pop {
+      0% { transform: translateY(0) scale(1); }
+      45% { transform: translateY(-2px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @media (max-width: 760px) {
+      header, section { padding: 20px; }
+      .story, .steps, .machine-layout { grid-template-columns: 1fr; }
+      .visual { min-height: 170px; }
+      .machine-stage { min-height: 430px; }
+    }
+    @media (max-width: 430px) {
+      .machine-stage { padding: 12px; }
+      .machine-top { gap: 6px; }
+      .machine-start {
+        min-width: 70px;
+        padding-inline: 8px;
+        font-size: .82rem;
+      }
+      .machine-lanes { gap: 4px; }
+      .machine-lane { padding-left: 2px; padding-right: 2px; }
+      .machine-moving-coin {
+        width: 13px;
+        height: 13px;
+      }
+      .machine-lane-label { font-size: .59rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+    @media print {
+      body { background: white; }
+      main { width: auto; margin: 0; }
+      header, section { break-inside: avoid; }
+      button, input { border: 1px solid #777; color: black; background: white; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Division: Teilen wie ein Team</h1>
+    <p>Heute lernst du einen starken Trick: Eine Division ist eine faire Verteilung. Wenn du unsicher bist, prüfst du sie mit einer Mal-Aufgabe.</p>
+    <p class="goal">Gewinn des Tages: <code>geteilt</code> rückwärts mit <code>mal</code> kontrollieren.</p>
+    <div class="lecture-icons" aria-hidden="true">
+      <span class="cue cue-ball"></span>
+      <span class="cue cue-divide"></span>
+      <span class="cue cue-coin"></span>
+      <span class="cue cue-gear"></span>
+    </div>
+  </header>
+
+  <section class="story" aria-labelledby="warmup">
+    <div>
+      <h2 id="warmup">1. Stell dir ein Fußballtraining vor</h2>
+      <p>Der Trainer hat <strong>24 Bälle</strong>. Es gibt <strong>6 Teams</strong>. Jedes Team soll gleich viele Bälle bekommen.</p>
+      <p>Die Frage ist: <code>24 : 6 = ?</code></p>
+      <p>Denke rückwärts: <strong>Welche Zahl mal 6 ergibt 24?</strong></p>
+      <p><code>4 x 6 = 24</code>, also ist <code>24 : 6 = 4</code>.</p>
+    </div>
+    <div class="visual visual-field" aria-hidden="true">
+      <div class="team-share-grid">
+        <div class="team-row">
+          <span class="team-name">Team 1</span>
+          <span class="ball-cluster"><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span></span>
+        </div>
+        <div class="team-row">
+          <span class="team-name">Team 2</span>
+          <span class="ball-cluster"><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span></span>
+        </div>
+        <div class="team-row">
+          <span class="team-name">Team 3</span>
+          <span class="ball-cluster"><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span></span>
+        </div>
+        <div class="team-row">
+          <span class="team-name">Team 4</span>
+          <span class="ball-cluster"><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span></span>
+        </div>
+        <div class="team-row">
+          <span class="team-name">Team 5</span>
+          <span class="ball-cluster"><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span></span>
+        </div>
+        <div class="team-row">
+          <span class="team-name">Team 6</span>
+          <span class="ball-cluster"><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span><span class="mini-ball"></span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="steps">
+    <h2 id="steps">2. Der 3-Schritt-Trick</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-icon step-icon-divide" aria-hidden="true"></span>
+        <strong>Teilen</strong>
+        <p>Was wird verteilt? Zum Beispiel 24 Bälle.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon step-icon-groups" aria-hidden="true"></span>
+        <strong>Gruppen</strong>
+        <p>Auf wie viele Gruppen? Zum Beispiel 6 Teams.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon step-icon-check" aria-hidden="true"></span>
+        <strong>Probe</strong>
+        <p>Passt die Mal-Aufgabe? <code>4 x 6 = 24</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="machine" aria-labelledby="machine">
+    <h2 id="machine">3. Erfinderlabor-Maschine</h2>
+    <div class="machine-layout">
+      <div>
+        <p>Stell dir eine Woozle-Goozle-artige Erfindermaschine vor. Sie macht immer drei Dinge nacheinander:</p>
+        <ol class="machine-steps">
+          <li><span class="machine-step-number">1</span><span><strong>Gesamtzahl hinein:</strong> 30 Münzen starten oben.</span></li>
+          <li><span class="machine-step-number">2</span><span><strong>Gruppen einstellen:</strong> Das Rad steht auf 5 Level.</span></li>
+          <li><span class="machine-step-number">3</span><span><strong>Gleich verteilen:</strong> Jedes Level bekommt 6 Münzen.</span></li>
+        </ol>
+        <p>Beispiel: <code>30 Münzen : 5 Level = 6 Münzen pro Level</code>.</p>
+        <p class="tiny">Maschinen-Test: Wenn unten 6 herauskommt und es 5 Level gibt, muss <code>6 x 5 = 30</code> stimmen.</p>
+      </div>
+      <div class="machine-stage" data-machine-stage>
+        <div class="machine-top">
+          <div class="machine-readout">30<small>Münzen oben</small></div>
+          <button type="button" class="machine-start" data-machine-start>Starten</button>
+          <div class="machine-dial-card">5<small>Level eingestellt</small></div>
+        </div>
+        <div class="machine-tray" aria-hidden="true"></div>
+        <div class="machine-pipe"></div>
+        <div class="machine-lanes">
+          <div class="machine-lane">
+            <span class="machine-lane-label">Level 1</span>
+            <span class="machine-lane-hint">6 Münzen</span>
+          </div>
+          <div class="machine-lane">
+            <span class="machine-lane-label">Level 2</span>
+            <span class="machine-lane-hint">6 Münzen</span>
+          </div>
+          <div class="machine-lane">
+            <span class="machine-lane-label">Level 3</span>
+            <span class="machine-lane-hint">6 Münzen</span>
+          </div>
+          <div class="machine-lane">
+            <span class="machine-lane-label">Level 4</span>
+            <span class="machine-lane-hint">6 Münzen</span>
+          </div>
+          <div class="machine-lane">
+            <span class="machine-lane-label">Level 5</span>
+            <span class="machine-lane-hint">6 Münzen</span>
+          </div>
+        </div>
+        <div class="machine-result">
+          <strong>6</strong>
+          <small>Münzen pro Level</small>
+          <span class="machine-proof">Probe: 6 x 5 = 30</span>
+        </div>
+        <span class="machine-moving-coin" style="--i: 0; --sx: 36px; --sy: 106px; --ex: calc(10% - 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 1; --sx: 60px; --sy: 106px; --ex: calc(10% + 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 2; --sx: 84px; --sy: 106px; --ex: calc(10% - 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 3; --sx: 108px; --sy: 106px; --ex: calc(10% + 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 4; --sx: 132px; --sy: 106px; --ex: calc(10% - 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 5; --sx: 156px; --sy: 106px; --ex: calc(10% + 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 6; --sx: 180px; --sy: 106px; --ex: calc(30% - 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 7; --sx: 204px; --sy: 106px; --ex: calc(30% + 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 8; --sx: 228px; --sy: 106px; --ex: calc(30% - 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 9; --sx: 252px; --sy: 106px; --ex: calc(30% + 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 10; --sx: 36px; --sy: 126px; --ex: calc(30% - 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 11; --sx: 60px; --sy: 126px; --ex: calc(30% + 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 12; --sx: 84px; --sy: 126px; --ex: calc(50% - 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 13; --sx: 108px; --sy: 126px; --ex: calc(50% + 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 14; --sx: 132px; --sy: 126px; --ex: calc(50% - 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 15; --sx: 156px; --sy: 126px; --ex: calc(50% + 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 16; --sx: 180px; --sy: 126px; --ex: calc(50% - 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 17; --sx: 204px; --sy: 126px; --ex: calc(50% + 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 18; --sx: 228px; --sy: 126px; --ex: calc(70% - 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 19; --sx: 252px; --sy: 126px; --ex: calc(70% + 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 20; --sx: 36px; --sy: 146px; --ex: calc(70% - 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 21; --sx: 60px; --sy: 146px; --ex: calc(70% + 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 22; --sx: 84px; --sy: 146px; --ex: calc(70% - 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 23; --sx: 108px; --sy: 146px; --ex: calc(70% + 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 24; --sx: 132px; --sy: 146px; --ex: calc(90% - 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 25; --sx: 156px; --sy: 146px; --ex: calc(90% + 10px); --ey: 278px"></span>
+        <span class="machine-moving-coin" style="--i: 26; --sx: 180px; --sy: 146px; --ex: calc(90% - 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 27; --sx: 204px; --sy: 146px; --ex: calc(90% + 10px); --ey: 300px"></span>
+        <span class="machine-moving-coin" style="--i: 28; --sx: 228px; --sy: 146px; --ex: calc(90% - 10px); --ey: 322px"></span>
+        <span class="machine-moving-coin" style="--i: 29; --sx: 252px; --sy: 146px; --ex: calc(90% + 10px); --ey: 322px"></span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="practice">
+    <h2 id="practice">4. Mini-Training</h2>
+    <p>Schreibe nur die Ergebniszahl in das Feld. Danach prüft die Seite sofort.</p>
+    <div class="quiz">
+      <div class="task">
+        <label for="q1"><span class="task-icon task-icon-ball" aria-hidden="true"></span><span>Fußball: 18 Leibchen werden auf 3 Teams verteilt. <code>18 : 3 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q1" inputmode="numeric" autocomplete="off">
+          <button type="button" data-answer="6" data-input="q1" data-feedback="f1" data-proof="6 x 3 = 18">Prüfen</button>
+        </div>
+        <p id="f1" class="feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="task">
+        <label for="q2"><span class="task-icon task-icon-coin" aria-hidden="true"></span><span>Mario-Level: 32 Münzen liegen gleichmäßig in 4 Leveln. <code>32 : 4 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q2" inputmode="numeric" autocomplete="off">
+          <button type="button" data-answer="8" data-input="q2" data-feedback="f2" data-proof="8 x 4 = 32">Prüfen</button>
+        </div>
+        <p id="f2" class="feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="task">
+        <label for="q3"><span class="task-icon task-icon-gear" aria-hidden="true"></span><span>Erfinderteile: 45 Schrauben werden in 5 gleiche Kisten gelegt. <code>45 : 5 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q3" inputmode="numeric" autocomplete="off">
+          <button type="button" data-answer="9" data-input="q3" data-feedback="f3" data-proof="9 x 5 = 45">Prüfen</button>
+        </div>
+        <p id="f3" class="feedback" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="say">
+    <h2 id="say">5. Sag es laut</h2>
+    <p>Für jede Aufgabe sagst du:</p>
+    <p><code>Ich teile ___ Dinge auf ___ Gruppen. Jede Gruppe bekommt ___. Die Probe ist ___ mal ___.</code></p>
+    <p>Beispiel: Ich teile 24 Bälle auf 6 Teams. Jedes Team bekommt 4. Die Probe ist 4 mal 6.</p>
+  </section>
+
+  <section aria-labelledby="next">
+    <h2 id="next">Nächstes Mal</h2>
+    <p>Wenn das klappt, ist der nächste kleine Schritt: Division mit Rest. Beispiel: 14 Pilze auf 3 Mario-Level verteilen.</p>
+    <p><a href="../reference/division-merkblatt.html">Merkblatt zur Division öffnen</a></p>
+    <p>Frag den Agenten nach mehr Aufgaben, wenn eine Stelle unklar ist oder wenn du ein neues Fußball- oder Mario-Level rechnen willst.</p>
+  </section>
+
+  <section aria-labelledby="sources">
+    <h2 id="sources">Quellen</h2>
+    <ul class="sources">
+      <li><a href="https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2022/2022_06_23-Bista-Primarbereich-Mathe.pdf">KMK Bildungsstandards Mathematik Primarbereich, 2022</a></li>
+      <li><a href="https://de.khanacademy.org/math/arithmetic/arith-review-multiply-divide">Khan Academy Deutsch: Multiplizieren und Dividieren</a></li>
+    </ul>
+  </section>
+</main>
+
+<script>
+  const machineStage = document.querySelector("[data-machine-stage]");
+  const machineStart = document.querySelector("[data-machine-start]");
+  if (machineStage && machineStart) {
+    machineStart.addEventListener("click", () => {
+      machineStage.classList.remove("machine-stage-run");
+      void machineStage.offsetWidth;
+      machineStage.classList.add("machine-stage-run");
+      machineStart.textContent = "Noch einmal";
+    });
+  }
+
+  const buttons = document.querySelectorAll("button[data-answer]");
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.getElementById(button.dataset.input);
+      const feedback = document.getElementById(button.dataset.feedback);
+      const value = input.value.trim().replace(",", ".");
+      const correct = value === button.dataset.answer;
+      feedback.classList.remove("celebrate");
+      void feedback.offsetWidth;
+      if (correct) {
+        feedback.className = "feedback ok";
+        feedback.textContent = `Richtig. Probe: ${button.dataset.proof}.`;
+        feedback.classList.add("celebrate");
+      } else {
+        feedback.className = "feedback no";
+        feedback.textContent = "Fast. Denk rückwärts: Welche Zahl mal die Gruppenzahl ergibt die Gesamtzahl?";
+      }
+    });
+  });
+</script>
+</body>
+</html>

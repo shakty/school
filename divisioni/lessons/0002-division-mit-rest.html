@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Division 2: Wenn ein Rest bleibt</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #142033;
+      --muted: #566276;
+      --line: #d7dee8;
+      --paper: #fffefa;
+      --field: #e8f6ed;
+      --sky: #edf6ff;
+      --gold: #f2b544;
+      --blue: #1f5e9d;
+      --green: #16764f;
+      --red: #b43b3b;
+      --violet: #6750a4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #eef7ff 0%, #f9fcff 42%, #f1f8ee 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      width: min(920px, calc(100vw - 28px));
+      margin: 22px auto 40px;
+    }
+    header {
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
+    h1, h2, h3 { line-height: 1.15; margin: 0 0 12px; }
+    h1 { font-size: clamp(2rem, 5vw, 3.05rem); letter-spacing: 0; }
+    h2 { font-size: 1.45rem; color: var(--blue); margin-top: 0; }
+    p { margin: 0 0 14px; }
+    a { color: var(--blue); }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.98em;
+      background: #f1f4f8;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    .goal {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--field);
+      border: 1px solid #b8e1c7;
+      font-weight: 700;
+    }
+    .lecture-icons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .cue {
+      width: 42px;
+      height: 42px;
+      border: 1px solid #cbd8e7;
+      border-radius: 8px;
+      background: #f7fbff;
+      display: grid;
+      place-items: center;
+      animation: calm-float 5.5s ease-in-out infinite;
+    }
+    .cue:nth-child(2) { animation-delay: .5s; }
+    .cue:nth-child(3) { animation-delay: 1s; }
+    .cue:nth-child(4) { animation-delay: 1.5s; }
+    .cue-mushroom::before,
+    .mushroom::before,
+    .task-icon-mushroom::before {
+      content: "";
+      width: 22px;
+      height: 20px;
+      border-radius: 14px 14px 8px 8px;
+      background:
+        radial-gradient(circle at 32% 35%, #fff 0 13%, transparent 14%),
+        radial-gradient(circle at 67% 38%, #fff 0 11%, transparent 12%),
+        #d94a4a;
+      border: 2px solid #7c2e2e;
+      box-shadow: inset 0 -7px 0 rgba(255,255,255,.55);
+    }
+    .cue-cone::before,
+    .task-icon-cone::before {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 11px solid transparent;
+      border-right: 11px solid transparent;
+      border-bottom: 25px solid var(--gold);
+      filter: drop-shadow(0 0 0 #8b5d08);
+    }
+    .cue-gear::before,
+    .task-icon-gear::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border: 5px solid var(--blue);
+      border-radius: 50%;
+      box-shadow:
+        0 -11px 0 -6px var(--blue),
+        0 11px 0 -6px var(--blue),
+        -11px 0 0 -6px var(--blue),
+        11px 0 0 -6px var(--blue);
+    }
+    .cue-rest::before {
+      content: "R";
+      color: var(--green);
+      font-size: 1.35rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    section {
+      margin-top: 18px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+    .story {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .visual {
+      min-height: 260px;
+      border: 1px solid #b7dec3;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.42) 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(0deg, rgba(255,255,255,.42) 1px, transparent 1px) 0 0 / 48px 48px,
+        #dff3e5;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+    .level-board {
+      width: min(340px, 100%);
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 10px 24px rgba(20, 32, 51, .12);
+    }
+    .level-row {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .level-name {
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .mushroom-cluster {
+      display: grid;
+      grid-template-columns: repeat(4, 24px);
+      gap: 7px;
+      align-items: center;
+      min-height: 28px;
+    }
+    .mushroom {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: start center;
+      animation: item-bounce 4.4s ease-in-out infinite;
+    }
+    .level-row:nth-child(2n) .mushroom { animation-delay: .35s; }
+    .rest-row {
+      margin-top: 4px;
+      padding-top: 10px;
+      border-top: 1px dashed #aeb8c6;
+    }
+    .rest-row .level-name { color: var(--red); }
+    .rest-row .mushroom-cluster {
+      grid-template-columns: repeat(2, 24px);
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .step {
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f9fbfd;
+    }
+    .step-icon,
+    .task-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 9px;
+      background: #eef7ff;
+      border: 1px solid #c8dced;
+      color: var(--blue);
+      font-weight: 900;
+    }
+    .step-icon-times::before { content: "x"; font-size: 1.35rem; }
+    .step-icon-under::before {
+      content: "";
+      width: 19px;
+      height: 15px;
+      border-left: 4px solid var(--green);
+      border-bottom: 4px solid var(--green);
+      transform: rotate(-45deg);
+      margin-top: -5px;
+    }
+    .step-icon-rest::before { content: "R"; color: var(--red); font-size: 1.35rem; }
+    .step strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green);
+    }
+    .lab {
+      border-left: 5px solid var(--gold);
+      background: #fff8e9;
+    }
+    .lab-layout {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+      align-items: center;
+    }
+    .lab-steps {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 14px;
+      padding: 0;
+      list-style: none;
+    }
+    .lab-steps li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px;
+      border: 1px solid #efd49c;
+      border-radius: 8px;
+      background: rgba(255,255,255,.62);
+    }
+    .lab-step-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold);
+      color: #432800;
+      font-weight: 900;
+      font-size: .84rem;
+    }
+    .lab-stage {
+      min-height: 380px;
+      border: 1px solid #f2d08c;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(178,107,0,.1) 1px, transparent 1px) 0 0 / 34px 34px,
+        linear-gradient(180deg, #fffdf7 0%, #fff7df 100%);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 6px rgba(255,255,255,.54);
+    }
+    .lab-top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: stretch;
+      position: relative;
+      z-index: 5;
+    }
+    .lab-start {
+      min-width: 88px;
+      padding-inline: 12px;
+      background: var(--green);
+      box-shadow: 0 8px 18px rgba(22, 118, 79, .18);
+      align-self: stretch;
+    }
+    .lab-start:hover { background: #115c3e; }
+    .lab-readout,
+    .lab-dial-card,
+    .lab-result {
+      border: 1px solid #d9a849;
+      border-radius: 8px;
+      background: white;
+      padding: 12px 10px;
+      text-align: center;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(178, 107, 0, .12);
+    }
+    .lab-readout small,
+    .lab-dial-card small,
+    .lab-result small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .72rem;
+    }
+    .lab-dial-card {
+      position: relative;
+      padding-left: 42px;
+    }
+    .lab-dial-card::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      width: 21px;
+      height: 21px;
+      margin-top: -10px;
+      border: 5px solid var(--blue);
+      border-radius: 50%;
+      box-shadow:
+        0 -10px 0 -6px var(--blue),
+        0 10px 0 -6px var(--blue),
+        -10px 0 0 -6px var(--blue),
+        10px 0 0 -6px var(--blue);
+    }
+    .lab-stage-run .lab-dial-card::before {
+      animation: dial-turn 1.1s ease-in-out;
+    }
+    .lab-equation {
+      margin: 12px 6px 0;
+      padding: 10px;
+      border: 1px solid rgba(217,168,73,.78);
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+      text-align: center;
+      font-weight: 900;
+      color: var(--violet);
+      position: relative;
+      z-index: 2;
+    }
+    .lab-groups {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      min-height: 132px;
+      margin-top: 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .lab-group {
+      min-height: 120px;
+      padding: 10px 4px;
+      border: 1px solid rgba(217,168,73,.7);
+      border-radius: 8px;
+      background: rgba(255,255,255,.72);
+      display: grid;
+      align-content: space-between;
+      gap: 6px;
+      text-align: center;
+    }
+    .lab-group-label {
+      color: var(--blue);
+      font-size: .7rem;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+    .lab-group-dots {
+      display: grid;
+      grid-template-columns: repeat(2, 18px);
+      gap: 5px;
+      justify-content: center;
+    }
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd36f, var(--gold));
+      border: 2px solid #9b650c;
+      opacity: .7;
+    }
+    .lab-leftover {
+      width: min(190px, 100%);
+      margin: 10px auto 0;
+      padding: 9px;
+      border: 2px dashed #e1a6a6;
+      border-radius: 8px;
+      background: #fff7f7;
+      text-align: center;
+      color: var(--red);
+      font-weight: 900;
+      position: relative;
+      z-index: 2;
+    }
+    .lab-leftover-dots {
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      margin-top: 6px;
+    }
+    .lab-stage-run .dot,
+    .lab-stage-run .lab-leftover {
+      animation: item-pop .7s ease-out both;
+    }
+    .lab-stage-run .lab-group:nth-child(2) .dot { animation-delay: .14s; }
+    .lab-stage-run .lab-group:nth-child(3) .dot { animation-delay: .28s; }
+    .lab-stage-run .lab-leftover { animation-delay: .56s; }
+    .lab-result {
+      margin-top: 12px;
+      background: #edf8f2;
+      border-color: #b8e1c7;
+      color: var(--green);
+      opacity: .52;
+      transform: translateY(4px);
+      position: relative;
+      z-index: 2;
+    }
+    .lab-stage-run .lab-result {
+      animation: result-readout 2.2s ease-out forwards;
+    }
+    .lab-result strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .task-list {
+      display: grid;
+      gap: 12px;
+    }
+    .task {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+    label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .task-icon {
+      width: 30px;
+      height: 30px;
+      margin-bottom: 0;
+      background: #fff8e9;
+      border-color: #efd49c;
+      flex: 0 0 auto;
+    }
+    .task-icon-mushroom::before,
+    .task-icon-cone::before,
+    .task-icon-gear::before {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .answer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    input {
+      width: 92px;
+      min-height: 42px;
+      border: 1px solid #aeb8c6;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 1.1rem;
+    }
+    button {
+      min-height: 42px;
+      border: 0;
+      border-radius: 6px;
+      padding: 9px 14px;
+      background: var(--blue);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:hover { background: #184f86; }
+    .feedback {
+      min-height: 26px;
+      margin: 10px 0 0;
+      font-weight: 700;
+    }
+    .feedback.celebrate { animation: feedback-pop .42s ease-out; }
+    .ok { color: var(--green); }
+    .no { color: var(--red); }
+    .tiny { color: var(--muted); font-size: .95rem; }
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .sources li { margin-bottom: 8px; }
+    @keyframes calm-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes item-bounce {
+      0%, 100% { transform: translateY(0); }
+      45% { transform: translateY(-2px); }
+    }
+    @keyframes dial-turn {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(180deg); }
+    }
+    @keyframes item-pop {
+      0% { opacity: .35; transform: translateY(-7px) scale(.92); }
+      70% { opacity: 1; transform: translateY(1px) scale(1.04); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes result-readout {
+      0%, 62% {
+        opacity: .52;
+        transform: translateY(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes feedback-pop {
+      0% { transform: translateY(0) scale(1); }
+      45% { transform: translateY(-2px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @media (max-width: 760px) {
+      header, section { padding: 20px; }
+      .story, .steps, .lab-layout { grid-template-columns: 1fr; }
+      .visual { min-height: 210px; }
+      .lab-stage { min-height: 380px; }
+    }
+    @media (max-width: 430px) {
+      .lab-stage { padding: 12px; }
+      .lab-top { gap: 6px; }
+      .lab-start {
+        min-width: 72px;
+        padding-inline: 8px;
+        font-size: .82rem;
+      }
+      .lab-group-dots {
+        grid-template-columns: repeat(2, 15px);
+        gap: 4px;
+      }
+      .dot {
+        width: 15px;
+        height: 15px;
+      }
+      .lab-group-label { font-size: .62rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+    @media print {
+      body { background: white; }
+      main { width: auto; margin: 0; }
+      header, section { break-inside: avoid; }
+      button, input { border: 1px solid #777; color: black; background: white; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Division: Wenn ein Rest bleibt</h1>
+    <p>Manchmal passt eine Division nicht ganz glatt. Dann suchst du zuerst die größte passende Mal-Aufgabe und zählst danach, was übrig bleibt.</p>
+    <p class="goal">Gewinn des Tages: <code>14 : 3 = 4 Rest 2</code> sicher erklären.</p>
+    <div class="lecture-icons" aria-hidden="true">
+      <span class="cue cue-mushroom"></span>
+      <span class="cue cue-rest"></span>
+      <span class="cue cue-cone"></span>
+      <span class="cue cue-gear"></span>
+    </div>
+  </header>
+
+  <section class="story" aria-labelledby="warmup">
+    <div>
+      <h2 id="warmup">1. Mario hat 14 Pilze</h2>
+      <p>Mario will <strong>14 Pilze</strong> gleichmäßig auf <strong>3 Level</strong> verteilen.</p>
+      <p>Die Frage ist: <code>14 : 3 = ?</code></p>
+      <p>Denke nicht: "Das geht nicht." Denke: <strong>Welche Mal-Aufgabe mit 3 kommt nah ran, aber nicht drüber?</strong></p>
+      <p><code>4 x 3 = 12</code>. Das passt. <code>5 x 3 = 15</code> wäre zu viel.</p>
+      <p>Also bekommt jedes Level <strong>4 Pilze</strong>. Von 14 bleiben nach 12 noch <strong>2 Pilze</strong> übrig.</p>
+      <p><code>14 : 3 = 4 Rest 2</code></p>
+    </div>
+    <div class="visual" aria-hidden="true">
+      <div class="level-board">
+        <div class="level-row">
+          <span class="level-name">Level 1</span>
+          <span class="mushroom-cluster"><span class="mushroom"></span><span class="mushroom"></span><span class="mushroom"></span><span class="mushroom"></span></span>
+        </div>
+        <div class="level-row">
+          <span class="level-name">Level 2</span>
+          <span class="mushroom-cluster"><span class="mushroom"></span><span class="mushroom"></span><span class="mushroom"></span><span class="mushroom"></span></span>
+        </div>
+        <div class="level-row">
+          <span class="level-name">Level 3</span>
+          <span class="mushroom-cluster"><span class="mushroom"></span><span class="mushroom"></span><span class="mushroom"></span><span class="mushroom"></span></span>
+        </div>
+        <div class="level-row rest-row">
+          <span class="level-name">Rest</span>
+          <span class="mushroom-cluster"><span class="mushroom"></span><span class="mushroom"></span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="steps">
+    <h2 id="steps">2. Der Rest-Trick in 3 Schritten</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-icon step-icon-times" aria-hidden="true"></span>
+        <strong>Mal-Reihe suchen</strong>
+        <p>Bei <code>14 : 3</code> schaust du in die Dreierreihe.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon step-icon-under" aria-hidden="true"></span>
+        <strong>Nah ran, nicht drüber</strong>
+        <p><code>12</code> passt, <code>15</code> ist zu groß.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon step-icon-rest" aria-hidden="true"></span>
+        <strong>Rest zählen</strong>
+        <p><code>14 - 12 = 2</code>. Also: <code>4 Rest 2</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lab" aria-labelledby="lab">
+    <h2 id="lab">3. Erfinderlabor: Rest-Finder</h2>
+    <div class="lab-layout">
+      <div>
+        <p>Die Maschine testet die passende Mal-Aufgabe. Sie stoppt genau vor "zu viel".</p>
+        <ol class="lab-steps">
+          <li><span class="lab-step-number">1</span><span><strong>Gesamtzahl:</strong> 14 Pilze liegen bereit.</span></li>
+          <li><span class="lab-step-number">2</span><span><strong>Gruppen:</strong> 3 Level sollen gleich viel bekommen.</span></li>
+          <li><span class="lab-step-number">3</span><span><strong>Stoppschild:</strong> <code>4 x 3 = 12</code> passt, <code>5 x 3 = 15</code> ist zu groß.</span></li>
+        </ol>
+        <p>Merksatz: <strong>Der Rest muss kleiner sein als die Gruppenzahl.</strong> Bei <code>14 : 3</code> ist der Rest 2. Das ist kleiner als 3.</p>
+        <p class="tiny">Probe: <code>4 x 3 + 2 = 14</code>. Erst die vollen Gruppen, dann der Rest.</p>
+      </div>
+      <div class="lab-stage" data-rest-stage>
+        <div class="lab-top">
+          <div class="lab-readout">14<small>Pilze oben</small></div>
+          <button type="button" class="lab-start" data-rest-start>Starten</button>
+          <div class="lab-dial-card">3<small>Level</small></div>
+        </div>
+        <div class="lab-equation">4 x 3 = 12 passt, 5 x 3 = 15 ist zu viel</div>
+        <div class="lab-groups">
+          <div class="lab-group">
+            <span class="lab-group-label">Level 1</span>
+            <span class="lab-group-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+          </div>
+          <div class="lab-group">
+            <span class="lab-group-label">Level 2</span>
+            <span class="lab-group-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+          </div>
+          <div class="lab-group">
+            <span class="lab-group-label">Level 3</span>
+            <span class="lab-group-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+          </div>
+        </div>
+        <div class="lab-leftover">
+          Rest: 2
+          <span class="lab-leftover-dots"><span class="dot"></span><span class="dot"></span></span>
+        </div>
+        <div class="lab-result">
+          <strong>4 Rest 2</strong>
+          <small>Probe: 4 x 3 + 2 = 14</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="practice">
+    <h2 id="practice">4. Mini-Training</h2>
+    <p>Schreibe die Antwort so: <code>4 R 2</code>. Danach prüft die Seite sofort.</p>
+    <div class="task-list">
+      <div class="task">
+        <label for="q1"><span class="task-icon task-icon-cone" aria-hidden="true"></span><span>Fußball: 17 Hütchen werden auf 4 Teams verteilt. <code>17 : 4 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q1" autocomplete="off" aria-label="Antwort zu 17 geteilt durch 4">
+          <button type="button" data-answer="4r1" data-input="q1" data-feedback="f1" data-proof="4 x 4 + 1 = 17">Prüfen</button>
+        </div>
+        <p id="f1" class="feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="task">
+        <label for="q2"><span class="task-icon task-icon-mushroom" aria-hidden="true"></span><span>Mario-Level: 26 Münzen liegen in 5 Leveln. <code>26 : 5 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q2" autocomplete="off" aria-label="Antwort zu 26 geteilt durch 5">
+          <button type="button" data-answer="5r1" data-input="q2" data-feedback="f2" data-proof="5 x 5 + 1 = 26">Prüfen</button>
+        </div>
+        <p id="f2" class="feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="task">
+        <label for="q3"><span class="task-icon task-icon-gear" aria-hidden="true"></span><span>Erfinderteile: 34 Schrauben sollen in 6 gleiche Kisten. <code>34 : 6 = ?</code></span></label>
+        <div class="answer-row">
+          <input id="q3" autocomplete="off" aria-label="Antwort zu 34 geteilt durch 6">
+          <button type="button" data-answer="5r4" data-input="q3" data-feedback="f3" data-proof="5 x 6 + 4 = 34">Prüfen</button>
+        </div>
+        <p id="f3" class="feedback" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="say">
+    <h2 id="say">5. Sag es laut</h2>
+    <p>Bei jeder Rest-Aufgabe sagst du:</p>
+    <p><code>Ich suche die größte Mal-Aufgabe, die noch passt. ___ mal ___ ist ___. Es bleiben ___ übrig.</code></p>
+    <p>Beispiel: Ich suche die größte Mal-Aufgabe mit 3, die noch passt. 4 mal 3 ist 12. Es bleiben 2 übrig.</p>
+  </section>
+
+  <section aria-labelledby="next">
+    <h2 id="next">Nächstes Mal</h2>
+    <p>Wenn das klappt, ist der nächste kleine Schritt: erkennen, ob eine Sachaufgabe "pro Gruppe" oder "wie viele Gruppen" fragt.</p>
+    <div class="nav">
+      <a href="./0001-teilen-wie-ein-team.html">Zur ersten Lektion</a>
+      <a href="../reference/division-merkblatt.html">Merkblatt zur Division öffnen</a>
+    </div>
+    <p>Frag den Agenten nach mehr Aufgaben, wenn eine Stelle unklar ist oder wenn du ein neues Fußball-, Erfinder- oder Mario-Beispiel rechnen willst.</p>
+  </section>
+
+  <section aria-labelledby="sources">
+    <h2 id="sources">Quellen</h2>
+    <ul class="sources">
+      <li><a href="https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2022/2022_06_23-Bista-Primarbereich-Mathe.pdf">KMK Bildungsstandards Mathematik Primarbereich, 2022</a></li>
+      <li><a href="https://de.khanacademy.org/math/arithmetic/arith-review-multiply-divide">Khan Academy Deutsch: Multiplizieren und Dividieren</a></li>
+    </ul>
+  </section>
+</main>
+
+<script>
+  const restStage = document.querySelector("[data-rest-stage]");
+  const restStart = document.querySelector("[data-rest-start]");
+  if (restStage && restStart) {
+    restStart.addEventListener("click", () => {
+      restStage.classList.remove("lab-stage-run");
+      void restStage.offsetWidth;
+      restStage.classList.add("lab-stage-run");
+      restStart.textContent = "Noch einmal";
+    });
+  }
+
+  const normalizeAnswer = (value) => value
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace("rest", "r");
+
+  const buttons = document.querySelectorAll("button[data-answer]");
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.getElementById(button.dataset.input);
+      const feedback = document.getElementById(button.dataset.feedback);
+      const correct = normalizeAnswer(input.value) === button.dataset.answer;
+      feedback.classList.remove("celebrate");
+      void feedback.offsetWidth;
+      if (correct) {
+        feedback.className = "feedback ok";
+        feedback.textContent = `Richtig. Probe: ${button.dataset.proof}.`;
+        feedback.classList.add("celebrate");
+      } else {
+        feedback.className = "feedback no";
+        feedback.textContent = "Fast. Suche die größte passende Mal-Aufgabe und zähle dann den Rest.";
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -25,7 +25,51 @@ const reference = readFileSync(
   "utf8",
 );
 
+const lessons = [lessonOne, lessonTwo, lessonThree];
+
 const expectations = [
+  {
+    name: "lectures use a child-focused guided stepper",
+    check: () => lessons.every((lesson) => lesson.includes('data-lesson-stepper')),
+  },
+  {
+    name: "lectures show one active lesson panel at a time",
+    check: () => lessons.every((lesson) =>
+      lesson.includes('class="lesson-panel is-active') &&
+      lesson.includes('data-step-panel="2" hidden') &&
+      lesson.includes('data-step-panel="3" hidden'),
+    ),
+  },
+  {
+    name: "lectures force hidden lesson panels out of layout",
+    check: () => lessons.every((lesson) =>
+      /\.lesson-panel\[hidden\]\s*{\s*display:\s*none !important;\s*}/.test(lesson),
+    ),
+  },
+  {
+    name: "lectures provide back, next, and show-all controls",
+    check: () => lessons.every((lesson) =>
+      lesson.includes('data-step-prev') &&
+      lesson.includes('data-step-next') &&
+      lesson.includes('data-step-show-all'),
+    ),
+  },
+  {
+    name: "lectures keep next and source material collapsed by default",
+    check: () => lessons.every((lesson) =>
+      lesson.includes('<details class="lesson-extra"') &&
+      lesson.includes('<summary>Nächstes Mal</summary>') &&
+      lesson.includes('<summary>Quellen</summary>'),
+    ),
+  },
+  {
+    name: "lectures wire stepper state updates",
+    check: () => lessons.every((lesson) =>
+      lesson.includes("activateStep(activeStep + 1)") &&
+      lesson.includes("panel.hidden = !isCurrent") &&
+      lesson.includes('status.textContent = `Schritt ${activeStep + 1} von ${panels.length}`'),
+    ),
+  },
   {
     name: "lecture 1 header has quiet visual cue strip",
     check: () => lessonOne.includes('class="lecture-icons"'),

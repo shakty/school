@@ -131,6 +131,82 @@
       border-radius: 8px;
       background: white;
     }
+    .lesson-stepper {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .lesson-status {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-weight: 900;
+    }
+    .step-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+      gap: 8px;
+    }
+    .lesson-stepper .step-tab {
+      min-height: 48px;
+      border: 1px solid #cbd8e7;
+      border-radius: 8px;
+      padding: 9px 11px;
+      background: #f7fbff;
+      color: var(--muted);
+      text-align: left;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .lesson-stepper .step-tab.is-active {
+      border-color: var(--blue);
+      background: #e8f2ff;
+      color: var(--blue);
+      box-shadow: inset 0 0 0 2px rgba(31, 94, 157, .14);
+    }
+    .lesson-stepper .step-tab.is-done {
+      border-color: #b8e1c7;
+      background: #edf8f2;
+      color: var(--green);
+    }
+    .lesson-panel.is-active {
+      animation: panel-in .24s ease-out;
+    }
+    .lesson-panel[hidden] {
+      display: none !important;
+    }
+    .lesson-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 18px 0 0;
+    }
+    .lesson-controls button:disabled {
+      opacity: .48;
+      cursor: not-allowed;
+    }
+    .lesson-controls .secondary {
+      border: 1px solid #cbd8e7;
+      background: #f7fbff;
+      color: var(--blue);
+    }
+    .lesson-extra {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+    .lesson-extra summary {
+      min-height: 54px;
+      padding: 16px 20px;
+      color: var(--blue);
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .lesson-extra-body {
+      padding: 0 20px 20px;
+    }
     .story {
       display: grid;
       grid-template-columns: 1.05fr .95fr;
@@ -543,6 +619,10 @@
       45% { transform: translateY(-2px) scale(1.02); }
       100% { transform: translateY(0) scale(1); }
     }
+    @keyframes panel-in {
+      from { opacity: .2; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     @media (max-width: 760px) {
       header, section { padding: 20px; }
       .story, .steps, .lab-layout { grid-template-columns: 1fr; }
@@ -578,6 +658,8 @@
     @media print {
       body { background: white; }
       main { width: auto; margin: 0; }
+      .lesson-stepper, .lesson-controls { display: none; }
+      .lesson-panel[hidden] { display: block !important; }
       header, section { break-inside: avoid; }
       button, input { border: 1px solid #777; color: black; background: white; }
     }
@@ -595,9 +677,19 @@
       <span class="cue cue-cone"></span>
       <span class="cue cue-gear"></span>
     </div>
+    <div class="lesson-stepper" data-lesson-stepper>
+      <p class="lesson-status" data-step-status>Schritt 1 von 5</p>
+      <div class="step-map" aria-label="Lektionsschritte">
+        <button type="button" class="step-tab is-active" data-step-tab="0">1. Geschichte</button>
+        <button type="button" class="step-tab" data-step-tab="1">2. Trick</button>
+        <button type="button" class="step-tab" data-step-tab="2">3. Labor</button>
+        <button type="button" class="step-tab" data-step-tab="3">4. Training</button>
+        <button type="button" class="step-tab" data-step-tab="4">5. Laut sagen</button>
+      </div>
+    </div>
   </header>
 
-  <section class="story" aria-labelledby="warmup">
+  <section class="lesson-panel is-active story" data-step-panel="1" aria-labelledby="warmup">
     <div>
       <h2 id="warmup">1. Mario hat 14 Pilze</h2>
       <p>Mario will <strong>14 Pilze</strong> gleichmäßig auf <strong>3 Level</strong> verteilen.</p>
@@ -629,7 +721,7 @@
     </div>
   </section>
 
-  <section aria-labelledby="steps">
+  <section class="lesson-panel" data-step-panel="2" hidden aria-labelledby="steps">
     <h2 id="steps">2. Der Rest-Trick in 3 Schritten</h2>
     <div class="steps">
       <div class="step">
@@ -650,7 +742,7 @@
     </div>
   </section>
 
-  <section class="lab" aria-labelledby="lab">
+  <section class="lesson-panel lab" data-step-panel="3" hidden aria-labelledby="lab">
     <h2 id="lab">3. Erfinderlabor: Rest-Finder</h2>
     <div class="lab-layout">
       <div>
@@ -696,7 +788,7 @@
     </div>
   </section>
 
-  <section aria-labelledby="practice">
+  <section class="lesson-panel" data-step-panel="4" hidden aria-labelledby="practice">
     <h2 id="practice">4. Mini-Training</h2>
     <p>Schreibe die Antwort so: <code>4 R 2</code>. Danach prüft die Seite sofort.</p>
     <div class="task-list">
@@ -729,34 +821,98 @@
     </div>
   </section>
 
-  <section aria-labelledby="say">
+  <section class="lesson-panel" data-step-panel="5" hidden aria-labelledby="say">
     <h2 id="say">5. Sag es laut</h2>
     <p>Bei jeder Rest-Aufgabe sagst du:</p>
     <p><code>Ich suche die größte Mal-Aufgabe, die noch passt. ___ mal ___ ist ___. Es bleiben ___ übrig.</code></p>
     <p>Beispiel: Ich suche die größte Mal-Aufgabe mit 3, die noch passt. 4 mal 3 ist 12. Es bleiben 2 übrig.</p>
   </section>
 
-  <section aria-labelledby="next">
-    <h2 id="next">Nächstes Mal</h2>
-    <p>Wenn das klappt, ist der nächste kleine Schritt: große Geteilt-Aufgaben in passende Teile zerlegen.</p>
-    <div class="nav">
-      <a href="./0001-teilen-wie-ein-team.html">Zur ersten Lektion</a>
-      <a href="./0003-grosse-zahlen-zerlegen.html">Dritte Lektion öffnen</a>
-      <a href="../reference/division-merkblatt.html">Merkblatt zur Division öffnen</a>
-    </div>
-    <p>Frag den Agenten nach mehr Aufgaben, wenn eine Stelle unklar ist oder wenn du ein neues Fußball-, Erfinder- oder Mario-Beispiel rechnen willst.</p>
-  </section>
+  <div class="lesson-controls">
+    <button type="button" class="secondary" data-step-prev>Zurück</button>
+    <button type="button" data-step-next>Weiter</button>
+    <button type="button" class="secondary" data-step-show-all>Alles anzeigen</button>
+  </div>
 
-  <section aria-labelledby="sources">
-    <h2 id="sources">Quellen</h2>
-    <ul class="sources">
-      <li><a href="https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2022/2022_06_23-Bista-Primarbereich-Mathe.pdf">KMK Bildungsstandards Mathematik Primarbereich, 2022</a></li>
-      <li><a href="https://de.khanacademy.org/math/arithmetic/arith-review-multiply-divide">Khan Academy Deutsch: Multiplizieren und Dividieren</a></li>
-    </ul>
-  </section>
+  <details class="lesson-extra">
+    <summary>Nächstes Mal</summary>
+    <div class="lesson-extra-body">
+      <p>Wenn das klappt, ist der nächste kleine Schritt: große Geteilt-Aufgaben in passende Teile zerlegen.</p>
+      <div class="nav">
+        <a href="./0001-teilen-wie-ein-team.html">Zur ersten Lektion</a>
+        <a href="./0003-grosse-zahlen-zerlegen.html">Dritte Lektion öffnen</a>
+        <a href="../reference/division-merkblatt.html">Merkblatt zur Division öffnen</a>
+      </div>
+      <p>Frag den Agenten nach mehr Aufgaben, wenn eine Stelle unklar ist oder wenn du ein neues Fußball-, Erfinder- oder Mario-Beispiel rechnen willst.</p>
+    </div>
+  </details>
+
+  <details class="lesson-extra">
+    <summary>Quellen</summary>
+    <div class="lesson-extra-body">
+      <ul class="sources">
+        <li><a href="https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2022/2022_06_23-Bista-Primarbereich-Mathe.pdf">KMK Bildungsstandards Mathematik Primarbereich, 2022</a></li>
+        <li><a href="https://de.khanacademy.org/math/arithmetic/arith-review-multiply-divide">Khan Academy Deutsch: Multiplizieren und Dividieren</a></li>
+      </ul>
+    </div>
+  </details>
 </main>
 
 <script>
+  const stepper = document.querySelector("[data-lesson-stepper]");
+  if (stepper) {
+    const panels = Array.from(document.querySelectorAll("[data-step-panel]"));
+    const tabs = Array.from(document.querySelectorAll("[data-step-tab]"));
+    const status = document.querySelector("[data-step-status]");
+    const prev = document.querySelector("[data-step-prev]");
+    const next = document.querySelector("[data-step-next]");
+    const showAll = document.querySelector("[data-step-show-all]");
+    let activeStep = 0;
+
+    const activateStep = (index, shouldScroll = true) => {
+      activeStep = Math.max(0, Math.min(index, panels.length - 1));
+      panels.forEach((panel, panelIndex) => {
+        const isCurrent = panelIndex === activeStep;
+        panel.hidden = !isCurrent;
+        panel.classList.toggle("is-active", isCurrent);
+        panel.classList.toggle("is-done", panelIndex < activeStep);
+      });
+      tabs.forEach((tab, tabIndex) => {
+        tab.classList.toggle("is-active", tabIndex === activeStep);
+        tab.classList.toggle("is-done", tabIndex < activeStep);
+        tab.setAttribute("aria-current", tabIndex === activeStep ? "step" : "false");
+      });
+      if (status) status.textContent = `Schritt ${activeStep + 1} von ${panels.length}`;
+      if (prev) prev.disabled = activeStep === 0;
+      if (next) {
+        next.disabled = activeStep === panels.length - 1;
+        next.textContent = activeStep === panels.length - 1 ? "Geschafft" : "Weiter";
+      }
+      if (showAll) showAll.disabled = false;
+      if (shouldScroll) panels[activeStep].scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => activateStep(Number(tab.dataset.stepTab)));
+    });
+    if (prev) prev.addEventListener("click", () => activateStep(activeStep - 1));
+    if (next) next.addEventListener("click", () => activateStep(activeStep + 1));
+    if (showAll) {
+      showAll.addEventListener("click", () => {
+        panels.forEach((panel) => {
+          panel.hidden = false;
+          panel.classList.add("is-active");
+        });
+        tabs.forEach((tab) => tab.classList.add("is-done"));
+        if (status) status.textContent = `Alle ${panels.length} Schritte sichtbar`;
+        if (prev) prev.disabled = true;
+        if (next) next.disabled = true;
+        showAll.disabled = true;
+      });
+    }
+    activateStep(0, false);
+  }
+
   const restStage = document.querySelector("[data-rest-stage]");
   const restStart = document.querySelector("[data-rest-start]");
   if (restStage && restStart) {
